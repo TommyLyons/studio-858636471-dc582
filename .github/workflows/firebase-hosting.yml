@@ -23,13 +23,15 @@ jobs:
         with:
           node-version: '20' # Use a modern version
 
-      # 2. Install Dependencies (FIX: Using npm ci for reliability)
+      # 2. Install Dependencies (Using npm ci for reliability)
       - name: Install Dependencies
         run: npm ci
 
-      # 3. Run Build (This creates the 'build' directory)
+      # 3. Run Build (CRITICAL FIX: Execute react-scripts directly from node_modules/.bin)
       - name: Build Project
-        run: npm run build
+        # The 'npm run build' command is failing to resolve the binary path.
+        # This line forces the execution path to the location where npm install put the binary.
+        run: ./node_modules/.bin/react-scripts build
 
       # 4. Deploy to Firebase
       - name: Deploy to Firebase
@@ -39,5 +41,5 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STUDIO_858636471_DC582 }}
           channelId: live
           projectId: studio-858636471-dc582
-          # FIX: Point entryPoint to the 'build' directory output by CRA
+          # Deployment path remains 'build'
           entryPoint: build
