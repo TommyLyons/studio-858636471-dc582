@@ -1,39 +1,33 @@
-# This workflow is designed to deploy a Create React App (CRA) project 
-# to Firebase Hosting via App Hosting.
-
 name: Deploy to Firebase Hosting
 
 on:
   push:
     branches:
-      - master # Triggers on push to the 'master' branch
-      - main   # Also triggers on push to the 'main' branch
+      - master
+      - main
 
 jobs:
   build_and_deploy:
-    runs-on: ubuntu-latest # Runs on a clean Linux environment
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 1. Setup Node.js Environment
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Use a modern version
+          node-version: '20'
 
-      # 2. Install Dependencies (Using npm ci for reliability)
+      - name: Clean NPM Cache
+        run: npm cache clean --force
+
       - name: Install Dependencies
         run: npm ci
 
-      # 3. Run Build (CRITICAL FIX: Execute react-scripts directly from node_modules/.bin)
       - name: Build Project
-        # The 'npm run build' command is failing to resolve the binary path.
-        # This line forces the execution path to the location where npm install put the binary.
-        run: ./node_modules/.bin/react-scripts build
+        run: npm run build
 
-      # 4. Deploy to Firebase
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
@@ -41,5 +35,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STUDIO_858636471_DC582 }}
           channelId: live
           projectId: studio-858636471-dc582
-          # Deployment path remains 'build'
           entryPoint: build
