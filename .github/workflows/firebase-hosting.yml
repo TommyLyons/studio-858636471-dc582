@@ -1,6 +1,5 @@
-# This workflow is designed to deploy a Next.js (or any npm-based) project
-# to Firebase Hosting using a remote Linux environment, completely bypassing
-# local Windows file system errors.
+# This workflow is designed to deploy a Create React App (CRA) project 
+# to Firebase Hosting via App Hosting.
 
 name: Deploy to Firebase Hosting
 
@@ -8,6 +7,7 @@ on:
   push:
     branches:
       - master # Triggers on push to the 'master' branch
+      - main   # Also triggers on push to the 'main' branch
 
 jobs:
   build_and_deploy:
@@ -23,15 +23,15 @@ jobs:
         with:
           node-version: '20' # Use a modern version
 
-      # 2. Install Dependencies (Crucial step that runs fine on Linux)
+      # 2. Install Dependencies (FIX: Using npm ci for reliability)
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
-      # 3. Run Next.js Build (Creates the .next directory)
+      # 3. Run Build (This creates the 'build' directory)
       - name: Build Project
         run: npm run build
 
-      # 4. Deploy to Firebase (Uses the Firebase token)
+      # 4. Deploy to Firebase
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
@@ -39,5 +39,5 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STUDIO_858636471_DC582 }}
           channelId: live
           projectId: studio-858636471-dc582
-          # We instruct Firebase to use the Next.js build output
-          entryPoint: .
+          # FIX: Point entryPoint to the 'build' directory output by CRA
+          entryPoint: build
